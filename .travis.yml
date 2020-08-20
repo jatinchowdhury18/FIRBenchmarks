@@ -38,11 +38,10 @@ install:
     fi
 
 script:
-  - cmake --version
   - cmake -Bbuild
   - cmake --build build --config Release
 
   # Run
   - if [[ $TRAVIS_OS_NAME == 'windows' ]]; then ./build/FIRTesting_artefacts/Release/FIRTesting.exe; fi
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then ./build/FIRTesting_artefacts/Release/FIRTesting; fi
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ./build/FIRTesting_artefacts/Release/FIRTesting; fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then ./build/FIRTesting_artefacts/FIRTesting; fi
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then ./build/FIRTesting_artefacts/FIRTesting; fi

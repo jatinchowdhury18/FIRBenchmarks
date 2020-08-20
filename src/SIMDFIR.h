@@ -3,6 +3,7 @@
 
 #include "BaseFilter.h"
 
+/** Dynamically allocated array that uses over-allocation to ensure SIMD alignment */
 template <typename T>
 struct AlignedArray
 {
@@ -21,6 +22,7 @@ struct AlignedArray
     T* arr;
 };
 
+/** FIR processor using SIMD inner product */
 class SimdFIR : public BaseFilter
 {
 public:
@@ -28,20 +30,22 @@ public:
         order (order),
         h (order)
     {
+        // allocate memory
         z = new float[2 * order];
     }
 
     virtual ~SimdFIR()
     {
+        // deallocate memory
         delete[] z;
     }
 
-    String getName() const { return "SimdFIR"; }
+    String getName() const override { return "SimdFIR"; }
 
     void prepare (double /*sampleRate*/, int /*samplesPerBlock*/) override
     {
-        zPtr = 0;
-        FloatVectorOperations::fill (z, 0.0f, 2 * order);
+        zPtr = 0; // reset state pointer
+        FloatVectorOperations::fill (z, 0.0f, 2 * order); // clear existing state
     }
 
     void loadIR (const AudioBuffer<float>& irBuffer) override
@@ -50,6 +54,7 @@ public:
         FloatVectorOperations::copy (h.arr, data, order);
     }
 
+    // load unaligned data into SIMD register
     inline dsp::SIMDRegister<float> loadUnaligned (float* x)
     {
         dsp::SIMDRegister<float> reg (0.0f);
@@ -59,9 +64,12 @@ public:
         return reg;
     }
 
+    // inner product using SIMD registers
     inline float simdInnerProduct (float* in, float* kernel, int numSamples, float y = 0.0f)
     {
         constexpr size_t simdN = dsp::SIMDRegister<float>::SIMDNumElements;
+
+        // compute SIMD products
         int idx = 0;
         for (; idx <= numSamples - simdN; idx += simdN)
         {
@@ -84,12 +92,14 @@ public:
         float y = 0.0f;
         for (int n = 0; n < numSamples; ++n)
         {
+            // load input into double-buffered state
             z[zPtr] = buffer[n];
             z[zPtr + order] = buffer[n];
 
+            // compute SIMD inner product over kernel and double-buffer state
             y = simdInnerProduct (z + zPtr, h.arr, order);
 
-            zPtr = (zPtr == 0 ? order - 1 : zPtr - 1);
+            zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
 
             buffer[n] = y;
         }

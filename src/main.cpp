@@ -8,11 +8,12 @@
 namespace
 {
     constexpr double sampleRate = 48000.0;
-    constexpr double numSeconds = 10.0f;
+    constexpr double numSeconds = 10.0;
     constexpr int numSamples = int (numSeconds * sampleRate);
     constexpr int blockSize = 512;
     constexpr int numIter = 200;
 
+    // power of 2 and prime IR sizes
     constexpr int irSizes[] = {16, 17, 31, 32, 64, 67, 127, 128, 256, 257, 509, 512};
 }
 
@@ -21,16 +22,20 @@ void testAccuracies();
 
 int main()
 {
+    // if running debug mode, check the accuracy
+    // of each FIR processor
 #if JUCE_DEBUG
     testAccuracies();
 #endif
 
+    std::cout << "SIMD size: " << dsp::SIMDRegister<float>::SIMDNumElements << std::endl;
+
+    // initialize global random object with the same seed for consistency
     Random rand (0x1234);
 
     const auto inputBuffer = createRandomBuffer (rand, numSamples);
     auto irBuffer = createRandomBuffer (rand, irSizes[2]);
 
-    // setup IR
     for (int irSize : irSizes)
     {
         std::cout << "Running with IR size: " << irSize << " samples" << std::endl;
@@ -44,6 +49,7 @@ int main()
         filters.push_back (std::make_unique<InnerProdNoWrapFIR> (irSize));
         filters.push_back (std::make_unique<SimdFIR> (irSize));
 
+        // get average time (ms) to process 10 seconds of audio
         for (auto& f : filters)
         {
             double timeSum = 0.0;
@@ -66,6 +72,7 @@ int main()
     return 0;
 }
 
+// create buffer of random values (-0.5, 0.5)
 AudioBuffer<float> createRandomBuffer (Random& rand, const int size)
 {
     AudioBuffer<float> buffer (1, size);
@@ -76,14 +83,17 @@ AudioBuffer<float> createRandomBuffer (Random& rand, const int size)
     return std::move (buffer);
 }
 
+// check the accuracy of each FIR processor
 void testAccuracies()
 {
     Random rand;
 
+    // set up buffers
     const auto irSize = 33; // irSizes[0];
     const auto testBuffer = createRandomBuffer (rand, blockSize);
     const auto irBuffer = createRandomBuffer (rand, irSize);
 
+    // process with an FIR processor
     auto runFIR = [=] (BaseFilter* fir) -> AudioBuffer<float>
     {
         AudioBuffer<float> copyBuff;
@@ -95,9 +105,11 @@ void testAccuracies()
         return std::move (copyBuff);
     };
 
-    std::unique_ptr<BaseFilter> refFIR = std::make_unique<JuceFIR>(); // reference FIR
+    // Use JUCE FIR as reference processor
+    std::unique_ptr<BaseFilter> refFIR = std::make_unique<JuceFIR>();
     auto refBuffer = runFIR (refFIR.get());
 
+    // check that all samples in the buffer are with range of the reference
     auto checkAccuracy = [&refBuffer = std::as_const (refBuffer)] (const AudioBuffer<float>& buffer)
     {
         for (int i = 0; i < buffer.getNumSamples(); ++i)
@@ -108,8 +120,8 @@ void testAccuracies()
         }
     };
 
+    // Run check for each fliter
     std::vector<std::unique_ptr<BaseFilter>> filters;
-    // filters.push_back (std::make_unique<JuceConvolution>());
     filters.push_back (std::make_unique<InnerProdFIR> (irSize));
     filters.push_back (std::make_unique<InnerProdNoWrapFIR> (irSize));
     filters.push_back (std::make_unique<SimdFIR> (irSize));

@@ -3,13 +3,14 @@
 
 #include "BaseFilter.h"
 
+/** FIR processor using juce::dsp::Convolution */
 class JuceConvolution : public BaseFilter
 {
 public:
     JuceConvolution() {}
     virtual ~JuceConvolution() {}
 
-    String getName() const { return "JuceConv"; }
+    String getName() const override { return "JuceConv"; }
 
     void prepare (double sampleRate, int samplesPerBlock) override
     {

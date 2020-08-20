@@ -3,13 +3,14 @@
 
 #include "BaseFilter.h"
 
+/** FIR processor using juce::dsp::FIR */
 class JuceFIR : public BaseFilter
 {
 public:
     JuceFIR() {}
     virtual ~JuceFIR() {}
 
-    String getName() const { return "JuceFIR"; }
+    String getName() const override { return "JuceFIR"; }
 
     void prepare (double sampleRate, int samplesPerBlock) override
     {
@@ -28,7 +29,6 @@ public:
         filt.coefficients = new dsp::FIR::Coefficients<float> (irBuffer.getReadPointer (0), irBuffer.getNumSamples());
         filt.reset();
     }
-
 
 private:
     dsp::FIR::Filter<float> filt;

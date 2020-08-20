@@ -4,17 +4,26 @@
 #include <JuceHeader.h>
 #include <chrono>
 
+/** Base class for a generic FIR filter */
 class BaseFilter
 {
 public:
     BaseFilter() {}
     virtual ~BaseFilter() {}
 
+    /** Returns the name of this processor */
     virtual String getName() const = 0;
+
+    /** Set sample rate and buffer size details for the processor */
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
+    
+    /** Process a buffer of samples with this processor */
     virtual void processBlock (AudioBuffer<float>& buffer) = 0;
+
+    /** Load an impulse response to process with this filter */
     virtual void loadIR (const AudioBuffer<float>& irBuffer) = 0;
 
+    /** Return the length of time (ms) needed for this processor to process the inputBuffer */
     double runBenchMs (const AudioBuffer<float> inputBuffer, const int blockSize)
     {
         AudioBuffer<float> processBuffer (1, blockSize);
