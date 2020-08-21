@@ -5,7 +5,6 @@ of various FIR filtering algorithms. Current algorithms include:
 - [JUCE FIR Filter](https://docs.juce.com/master/classdsp_1_1FIR_1_1Filter.html)
 - [JUCE Convolution](https://docs.juce.com/master/classdsp_1_1Convolution.html)
 - [std::inner_product](https://en.cppreference.com/w/cpp/algorithm/inner_produc)
-- std::inner_product, double-buffered
 - SIMD-acclerated inner product
 
 For further explanation of each algorithm, please see this
@@ -14,7 +13,8 @@ For further explanation of each algorithm, please see this
 ## Results
 
 So far, I only have the results of the benchmarks from my machine
-(a 2017 Dell laptop with an Intel i7 CPU).
+(a 2017 Dell laptop with an Intel i7 CPU), and a Mac machine
+accessed through the Travis CI platform.
 
 <img src="./results/figures/win_pow.png" alt="Pic" width="400"> <img src="./results/figures/mac_pow.png" alt="Pic" width="400">
 
@@ -22,6 +22,28 @@ For more results, see the `./results/figures/` directory.
 
 Benchmark results and algorithm optimization from the community
 is greatly appreciated!
+
+## Running
+
+If you wish to build and run the benchmarks for yourself, use
+the following steps (requires `cmake`):
+
+```bash
+# clone repository
+$ git clone https://github.com/FIRBenchmarks
+$ cd FIRBenchmarks/
+
+# update submodules
+$ git submodule update --init
+
+# build with CMake
+$ cmake -Bbuild
+$ cmake --build build --config Release
+
+# run benchmarks
+$ ./build/FIRTesting_artefacts/FIRTesting
+# On Windows use this instead: ./build/FIRTesting_artefacts/Release/FIRTesting.exe
+```
 
 ## License
 
