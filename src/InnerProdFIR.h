@@ -14,7 +14,7 @@ public:
         // allocate memory
         // (smart pointers would be preferred, but introduce a small overhead)
         h = new float[order];
-        z = new float[order];
+        z = new float[2 * order];
     }
 
     virtual ~InnerProdFIR()
@@ -29,7 +29,7 @@ public:
     void prepare (double /*sampleRate*/, int /*samplesPerBlock*/) override
     {
         zPtr = 0;// reset state pointer
-        std::fill (z, &z[order], 0.0f); // clear existing state
+        std::fill (z, &z[2 * order], 0.0f); // clear existing state
     }
 
     void loadIR (const AudioBuffer<float>& irBuffer) override
@@ -46,11 +46,12 @@ public:
         float y = 0.0f;
         for (int n = 0; n < numSamples; ++n)
         {
-            z[zPtr] = buffer[n]; // insert input into state
+            // insert input into double-buffered state
+            z[zPtr] = buffer[n];
+            z[zPtr + order] = buffer[n];
 
-            // compute two inner products between kernel and wrapped state buffer
-            y = std::inner_product (z + zPtr, z + order, h, 0.0f);
-            y = std::inner_product (z, z + zPtr, h + (order - zPtr), y);
+            // compute inner product over kernel and double-buffer state
+            y = std::inner_product (z + zPtr, z + zPtr + order, h, 0.0f);
 
             zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
 

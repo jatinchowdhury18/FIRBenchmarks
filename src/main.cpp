@@ -2,7 +2,6 @@
 #include "JuceConvolution.h"
 #include "JuceFIR.h"
 #include "InnerProdFIR.h"
-#include "InnerProdNoWrapFIR.h"
 #include "SIMDFIR.h"
 
 namespace
@@ -46,7 +45,6 @@ int main()
         filters.push_back (std::make_unique<JuceConvolution>());
         filters.push_back (std::make_unique<JuceFIR>());
         filters.push_back (std::make_unique<InnerProdFIR> (irSize));
-        filters.push_back (std::make_unique<InnerProdNoWrapFIR> (irSize));
         filters.push_back (std::make_unique<SimdFIR> (irSize));
 
         // get average time (ms) to process 10 seconds of audio
@@ -123,7 +121,6 @@ void testAccuracies()
     // Run check for each fliter
     std::vector<std::unique_ptr<BaseFilter>> filters;
     filters.push_back (std::make_unique<InnerProdFIR> (irSize));
-    filters.push_back (std::make_unique<InnerProdNoWrapFIR> (irSize));
     filters.push_back (std::make_unique<SimdFIR> (irSize));
 
     for (auto& f : filters)
