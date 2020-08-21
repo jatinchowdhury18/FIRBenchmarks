@@ -2,84 +2,72 @@ SIMD size: 4
 Running with IR size: 16 samples
 JuceConv: 24.9084
 JuceFIR: 27.0098
-InnerProdFIR: 26.979
-InnerProdNoWrapFIR: 26.4153
+InnerProdFIR: 26.4153
 SimdFIR: 10.6894
 
 Running with IR size: 17 samples
 JuceConv: 24.8913
 JuceFIR: 28.4858
-InnerProdFIR: 28.5301
-InnerProdNoWrapFIR: 29.3751
+InnerProdFIR: 29.3751
 SimdFIR: 11.2853
 
 Running with IR size: 31 samples
 JuceConv: 24.8693
 JuceFIR: 46.5435
-InnerProdFIR: 52.2986
-InnerProdNoWrapFIR: 45.7076
+InnerProdFIR: 45.7076
 SimdFIR: 14.3676
 
 Running with IR size: 32 samples
 JuceConv: 24.221
 JuceFIR: 53.1717
-InnerProdFIR: 53.8729
-InnerProdNoWrapFIR: 48.4588
+InnerProdFIR: 48.4588
 SimdFIR: 10.9724
 
 Running with IR size: 64 samples
 JuceConv: 24.2208
 JuceFIR: 96.5828
-InnerProdFIR: 97.1145
-InnerProdNoWrapFIR: 97.0937
+InnerProdFIR: 97.0937
 SimdFIR: 11.5509
 
 Running with IR size: 67 samples
 JuceConv: 24.1932
 JuceFIR: 99.0691
-InnerProdFIR: 101.289
-InnerProdNoWrapFIR: 100.388
+InnerProdFIR: 100.388
 SimdFIR: 14.2681
 
 Running with IR size: 127 samples
 JuceConv: 23.9809
 JuceFIR: 191.886
-InnerProdFIR: 184.692
-InnerProdNoWrapFIR: 182.179
+InnerProdFIR: 182.179
 SimdFIR: 18.6417
 
 Running with IR size: 128 samples
 JuceConv: 25.3024
 JuceFIR: 196.636
-InnerProdFIR: 192.157
-InnerProdNoWrapFIR: 190.175
+InnerProdFIR: 190.175
 SimdFIR: 14.8714
 
 Running with IR size: 256 samples
 JuceConv: 24.5858
 JuceFIR: 371.815
-InnerProdFIR: 374.079
-InnerProdNoWrapFIR: 374.058
+InnerProdFIR: 374.058
 SimdFIR: 22.7654
 
 Running with IR size: 257 samples
 JuceConv: 25.287
 JuceFIR: 378.465
-InnerProdFIR: 375.882
-InnerProdNoWrapFIR: 371.645
+InnerProdFIR: 371.645
 SimdFIR: 22.3045
 
 Running with IR size: 509 samples
 JuceConv: 24.8691
 JuceFIR: 729.014
-InnerProdFIR: 725.413
-InnerProdNoWrapFIR: 738.955
+InnerProdFIR: 738.955
 SimdFIR: 37.3375
 
 Running with IR size: 512 samples
 JuceConv: 26.9586
 JuceFIR: 742.351
-InnerProdFIR: 731.17
-InnerProdNoWrapFIR: 727.696
+InnerProdFIR: 727.696
 SimdFIR: 35.1468
 

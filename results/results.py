@@ -11,12 +11,12 @@ def get_results_from_list(idx, lines, results):
     results['keys'].append(ir_size)
 
     blocks = {}
-    for i in range(1, 6):
+    for i in range(1, 5):
         out = lines[idx + i].split()
         blocks[out[0][:-1]] = 10.0 / float(out[1])
 
     results[ir_size] = blocks
-    return idx+6
+    return idx+5
 
 
 def get_results_from_file(file):
@@ -48,7 +48,7 @@ def get_results_from_file(file):
 
 def plot_results(results, title='', file=None):
     keys = results['keys']
-    types = ['JuceConv', 'JuceFIR', 'InnerProdFIR', 'InnerProdNoWrapFIR', 'SimdFIR']
+    types = ['JuceConv', 'JuceFIR', 'InnerProdFIR', 'SimdFIR']
 
     ind = np.arange(len(keys))
     width = 0.15
