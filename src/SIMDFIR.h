@@ -3,6 +3,10 @@
 
 #include "BaseFilter.h"
 
+#if JUCE_MAC
+#include <Accelerate/Accelerate.h>
+#endif
+
 /** Dynamically allocated array that uses over-allocation to ensure SIMD alignment */
 template <typename T>
 struct AlignedArray
@@ -67,6 +71,10 @@ public:
     // inner product using SIMD registers
     inline float simdInnerProduct (float* in, float* kernel, int numSamples, float y = 0.0f)
     {
+#if JUCE_MAC
+        // On Mac we can use vDSP, which (I think) uses SIMD internally
+        vDSP_dotpr (in, 1, kernel, 1, &y, numSamples);
+#else
         constexpr size_t simdN = dsp::SIMDRegister<float>::SIMDNumElements;
 
         // compute SIMD products
@@ -78,8 +86,9 @@ public:
             y += (simdIn * simdKernel).sum();
         }
 
-        // comupte leftover samples
+        // compute leftover samples
         y = std::inner_product (in + idx, in + numSamples, kernel + idx, y);
+#endif
 
         return y;
     }
