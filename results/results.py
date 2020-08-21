@@ -61,7 +61,8 @@ def plot_results(results, title='', file=None):
         offset = (width * (len(types) - 1) / 2) - width / 2
         plt.bar(ind - offset + width * i, times, width, label=t)
 
-    plt.ylabel('Time [milliseconds]')
+    plt.ylabel('Speed [seconds audio / ms]')
+    plt.xlabel('IR Length [samples]')
     plt.title(title)
 
     plt.xticks(ind + width / 2, keys)
@@ -71,8 +72,9 @@ def plot_results(results, title='', file=None):
         plt.savefig(file)
 
 win_pow, win_prime = get_results_from_file('results/results_win.txt')
+mac_pow, mac_prime = get_results_from_file('results/results_mac.txt')
 
-plot_results(win_pow, 'Power of 2 Benchmarks (Windows)')
-plot_results(win_prime, 'Prime Benchmarks (Windows)')
-
-plt.show()
+plot_results(win_pow, 'Power of 2 Benchmarks (Windows)', 'results/figures/win_pow.png')
+plot_results(win_prime, 'Prime Benchmarks (Windows)', 'results/figures/win_prime.png')
+plot_results(mac_pow, 'Power of 2 Benchmarks (Macintosh)', 'results/figures/mac_pow.png')
+plot_results(mac_prime, 'Prime Benchmarks (Macintosh)', 'results/figures/mac_prime.png')
