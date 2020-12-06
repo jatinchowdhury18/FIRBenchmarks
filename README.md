@@ -12,9 +12,9 @@ For further explanation of each algorithm, please see this
 
 ## Results
 
-So far, I only have the results of the benchmarks from my machine
-(a 2017 Dell laptop with an Intel i7 CPU), and a Mac machine
-accessed through the Travis CI platform.
+So far, I have the results of the benchmarks from a Windows machine
+(a 2017 Dell laptop with an Intel i7 CPU), and a Mac machine (a
+2019 MacBook Pro with an Intel i9 CPU).
 
 <img src="./results/figures/win_pow.png" alt="Pic" width="400"> <img src="./results/figures/mac_pow.png" alt="Pic" width="400">
 
