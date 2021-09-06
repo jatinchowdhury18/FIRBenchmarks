@@ -37,7 +37,7 @@ $ cd FIRBenchmarks/
 $ git submodule update --init
 
 # build with CMake
-$ cmake -Bbuild
+$ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --config Release
 
 # run benchmarks

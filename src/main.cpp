@@ -1,6 +1,7 @@
 #include <JuceHeader.h>
 #include "JuceConvolution.h"
 #include "JuceFIR.h"
+#include "RustFIR.h"
 #include "InnerProdFIR.h"
 #include "SIMDFIR.h"
 
@@ -10,10 +11,12 @@ namespace
     constexpr double numSeconds = 10.0;
     constexpr int numSamples = int (numSeconds * sampleRate);
     constexpr int blockSize = 512;
-    constexpr int numIter = 200;
+    // constexpr int numIter = 200;
+    constexpr int numIter = 20;
 
     // power of 2 and prime IR sizes
-    constexpr int irSizes[] = {16, 17, 31, 32, 64, 67, 127, 128, 256, 257, 509, 512};
+    // constexpr int irSizes[] = {16, 17, 31, 32, 64, 67, 127, 128, 256, 257, 509, 512};
+    constexpr int irSizes[] = {16, 17};
 }
 
 AudioBuffer<float> createRandomBuffer (Random& rand, const int size);
@@ -33,8 +36,6 @@ int main()
     Random rand (0x1234);
 
     const auto inputBuffer = createRandomBuffer (rand, numSamples);
-    auto irBuffer = createRandomBuffer (rand, irSizes[2]);
-
     for (int irSize : irSizes)
     {
         std::cout << "Running with IR size: " << irSize << " samples" << std::endl;
@@ -42,8 +43,9 @@ int main()
         auto irBuffer = createRandomBuffer (rand, irSize);
 
         std::vector<std::unique_ptr<BaseFilter>> filters;
-        filters.push_back (std::make_unique<JuceConvolution>());
+        // filters.push_back (std::make_unique<JuceConvolution>());
         filters.push_back (std::make_unique<JuceFIR>());
+        filters.push_back (std::make_unique<RustFIR> (irSize));
         filters.push_back (std::make_unique<InnerProdFIR> (irSize));
         filters.push_back (std::make_unique<SimdFIR> (irSize));
 
@@ -121,6 +123,7 @@ void testAccuracies()
     // Run check for each fliter
     std::vector<std::unique_ptr<BaseFilter>> filters;
     filters.push_back (std::make_unique<InnerProdFIR> (irSize));
+    filters.push_back (std::make_unique<RustFIR> (irSize));
     filters.push_back (std::make_unique<SimdFIR> (irSize));
 
     for (auto& f : filters)
@@ -129,4 +132,6 @@ void testAccuracies()
         auto outBuffer = runFIR (f.get());
         checkAccuracy (outBuffer);
     }
+
+    std::cout << "Done checking accuracy!" << std::endl;
 }
