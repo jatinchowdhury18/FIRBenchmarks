@@ -11,12 +11,11 @@ namespace
     constexpr double numSeconds = 10.0;
     constexpr int numSamples = int (numSeconds * sampleRate);
     constexpr int blockSize = 512;
-    // constexpr int numIter = 200;
-    constexpr int numIter = 20;
+    constexpr int numIter = 100;
 
     // power of 2 and prime IR sizes
     // constexpr int irSizes[] = {16, 17, 31, 32, 64, 67, 127, 128, 256, 257, 509, 512};
-    constexpr int irSizes[] = {16, 17};
+    constexpr int irSizes[] = {16, 17, 31, 32, 64, 67, 127, 128};
 }
 
 AudioBuffer<float> createRandomBuffer (Random& rand, const int size);
@@ -26,9 +25,9 @@ int main()
 {
     // if running debug mode, check the accuracy
     // of each FIR processor
-#if JUCE_DEBUG
+// #if JUCE_DEBUG
     testAccuracies();
-#endif
+// #endif
 
     std::cout << "SIMD size: " << dsp::SIMDRegister<float>::SIMDNumElements << std::endl;
 

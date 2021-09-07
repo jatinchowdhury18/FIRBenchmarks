@@ -13,7 +13,8 @@ struct AlignedArray
 {
     AlignedArray (int N)
     {
-        arr_unaligned = new T[2 * N];
+        padded_length = N + dsp::SIMDRegister<T>::size();
+        arr_unaligned = new T[padded_length];
         arr = dsp::SIMDRegister<T>::getNextSIMDAlignedPtr (arr_unaligned);
     }
 
@@ -24,6 +25,7 @@ struct AlignedArray
 
     T* arr_unaligned;
     T* arr;
+    int padded_length;
 };
 
 /** FIR processor using SIMD inner product */
@@ -32,40 +34,25 @@ class SimdFIR : public BaseFilter
 public:
     SimdFIR (int order) :
         order (order),
-        h (order)
+        h (order),
+        z (2 * order)
     {
-        // allocate memory
-        z = new float[2 * order];
     }
 
-    virtual ~SimdFIR()
-    {
-        // deallocate memory
-        delete[] z;
-    }
+    ~SimdFIR() override = default;
 
     String getName() const override { return "SimdFIR"; }
 
     void prepare (double /*sampleRate*/, int /*samplesPerBlock*/) override
     {
         zPtr = 0; // reset state pointer
-        FloatVectorOperations::fill (z, 0.0f, 2 * order); // clear existing state
+        FloatVectorOperations::fill (z.arr, 0.0f, 2 * order); // clear existing state
     }
 
     void loadIR (const AudioBuffer<float>& irBuffer) override
     {
         auto* data = irBuffer.getReadPointer (0);
         FloatVectorOperations::copy (h.arr, data, order);
-    }
-
-    // load unaligned data into SIMD register
-    inline dsp::SIMDRegister<float> loadUnaligned (float* x)
-    {
-        dsp::SIMDRegister<float> reg (0.0f);
-        for (int i = 0; i < dsp::SIMDRegister<float>::SIMDNumElements; ++i)
-            reg.set (i, x[i]);
-
-        return reg;
     }
 
     // inner product using SIMD registers
@@ -81,7 +68,7 @@ public:
         int idx = 0;
         for (; idx <= numSamples - simdN; idx += simdN)
         {
-            auto simdIn = loadUnaligned (in + idx);
+            auto simdIn = chowdsp::SIMDUtils::loadUnaligned (in + idx);
             auto simdKernel = dsp::SIMDRegister<float>::fromRawArray (kernel + idx);
             y += (simdIn * simdKernel).sum();
         }
@@ -102,11 +89,11 @@ public:
         for (int n = 0; n < numSamples; ++n)
         {
             // load input into double-buffered state
-            z[zPtr] = buffer[n];
-            z[zPtr + order] = buffer[n];
+            z.arr[zPtr] = buffer[n];
+            z.arr[zPtr + order] = buffer[n];
 
             // compute SIMD inner product over kernel and double-buffer state
-            y = simdInnerProduct (z + zPtr, h.arr, order);
+            y = simdInnerProduct (z.arr + zPtr, h.arr, order);
 
             zPtr = (zPtr == 0 ? order - 1 : zPtr - 1); // iterate state pointer in reverse
 
@@ -119,7 +106,7 @@ protected:
     const int order;
 
 private:
-    float* z;
+    AlignedArray<float> z;
     int zPtr = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimdFIR)
